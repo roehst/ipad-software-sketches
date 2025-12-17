@@ -46,7 +46,7 @@ struct VectorStroke: Identifiable, Codable {
     
     /// Convert stroke to SVG path element
     func toSVGPath() -> String {
-        guard points.count > 0 else { return "" }
+        guard !points.isEmpty else { return "" }
         
         var pathData = "M \(points[0].x),\(points[0].y)"
         
@@ -115,7 +115,7 @@ class DrawingModel: ObservableObject {
     
     func endStroke() {
         guard let stroke = currentStroke else { return }
-        if stroke.points.count > 0 {
+        if !stroke.points.isEmpty {
             strokes.append(stroke)
         }
         currentStroke = nil

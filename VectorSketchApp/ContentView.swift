@@ -57,12 +57,14 @@ struct ContentView: View {
     }
     
     private func sendToLLM() {
-        let svg = drawingModel.exportToSVG()
-        // Placeholder for LLM integration
-        // In a real implementation, this would send the SVG to an LLM API
-        print("Sending to LLM:")
-        print(svg)
-        // Example: await sendToOpenAI(svgData: svg)
+        Task {
+            let svg = drawingModel.exportToSVG()
+            // Placeholder for LLM integration
+            // In a real implementation, this would send the SVG to an LLM API
+            print("Sending to LLM:")
+            print(svg)
+            // Example: await sendToOpenAI(svgData: svg)
+        }
     }
 }
 

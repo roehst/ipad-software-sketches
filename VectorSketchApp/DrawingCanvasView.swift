@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import PencilKit
 
 struct DrawingCanvasView: UIViewRepresentable {
     @ObservedObject var drawingModel: DrawingModel
