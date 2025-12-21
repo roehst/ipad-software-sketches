@@ -1,5 +1,7 @@
 # Vector Sketch App for iPad
 
+[![iOS Build and Screenshot](https://github.com/roehst/ipad-software-sketches/actions/workflows/ios-build.yml/badge.svg)](https://github.com/roehst/ipad-software-sketches/actions/workflows/ios-build.yml)
+
 A vector-based drawing application for iPad Air with Apple Pencil support. The app captures drawings as pure vector data (no bitmaps/rasterization) and can export to SVG format for LLM analysis.
 
 ## Features
