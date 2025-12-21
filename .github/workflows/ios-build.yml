@@ -70,12 +70,16 @@ jobs:
     
     - name: Launch app and capture screenshot
       run: |
-        # Get bundle identifier
+        # Get bundle identifier from project
         BUNDLE_ID="com.vectorsketch.app"
         
         # Launch the app
         echo "Launching app..."
-        xcrun simctl launch --console $SIMULATOR_ID $BUNDLE_ID || true
+        if xcrun simctl launch --console $SIMULATOR_ID $BUNDLE_ID; then
+          echo "App launched successfully"
+        else
+          echo "Warning: App launch returned non-zero exit code, but continuing to capture screenshot"
+        fi
         
         # Wait for app to launch and render
         sleep 5

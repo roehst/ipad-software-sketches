@@ -95,7 +95,7 @@ To activate the CI/CD pipeline:
 
 ### Runner Environment
 - **OS**: macOS 14 (Sonoma)
-- **Xcode**: 15.2
+- **Xcode**: 15.2 (corresponds to `/Applications/Xcode_15.2.app` on GitHub Actions macOS runners)
 - **Simulator**: iPad Air (5th generation), iOS 17.2
 - **Build Type**: Debug
 - **Code Signing**: Disabled (simulator only)
