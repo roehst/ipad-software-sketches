@@ -1,0 +1,117 @@
+name: iOS Build and Screenshot
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Test iOS App
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+    
+    - name: List available simulators
+      run: xcrun simctl list devices available
+    
+    - name: Build for simulator
+      run: |
+        xcodebuild \
+          -project VectorSketchApp.xcodeproj \
+          -scheme VectorSketchApp \
+          -destination 'platform=iOS Simulator,name=iPad Air (5th generation),OS=17.2' \
+          -configuration Debug \
+          -derivedDataPath ./DerivedData \
+          build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+    
+    - name: Boot simulator
+      run: |
+        # Find the iPad Air simulator
+        DEVICE_ID=$(xcrun simctl list devices available | grep "iPad Air (5th generation)" | grep -v unavailable | head -1 | grep -o "[A-F0-9\-]\{36\}")
+        echo "Found device ID: $DEVICE_ID"
+        
+        # Boot the simulator if not already booted
+        xcrun simctl boot "$DEVICE_ID" || true
+        
+        # Wait for simulator to boot
+        echo "Waiting for simulator to boot..."
+        sleep 10
+        
+        # Verify simulator is booted
+        xcrun simctl list devices | grep Booted
+        
+        # Store device ID for later steps
+        echo "SIMULATOR_ID=$DEVICE_ID" >> $GITHUB_ENV
+    
+    - name: Install app on simulator
+      run: |
+        # Find the built app
+        APP_PATH=$(find ./DerivedData -name "VectorSketchApp.app" -type d | head -1)
+        echo "App path: $APP_PATH"
+        
+        # Install the app
+        xcrun simctl install $SIMULATOR_ID "$APP_PATH"
+        
+        echo "App installed successfully"
+    
+    - name: Launch app and capture screenshot
+      run: |
+        # Get bundle identifier from project
+        BUNDLE_ID="com.vectorsketch.app"
+        
+        # Launch the app
+        echo "Launching app..."
+        if xcrun simctl launch --console $SIMULATOR_ID $BUNDLE_ID; then
+          echo "App launched successfully"
+        else
+          echo "Warning: App launch returned non-zero exit code, but continuing to capture screenshot"
+        fi
+        
+        # Wait for app to launch and render
+        sleep 5
+        
+        # Create screenshots directory
+        mkdir -p screenshots
+        
+        # Capture screenshot
+        xcrun simctl io $SIMULATOR_ID screenshot screenshots/app-screenshot.png
+        
+        echo "Screenshot captured successfully"
+    
+    - name: Upload screenshot
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-screenshot
+        path: screenshots/app-screenshot.png
+        retention-days: 30
+    
+    - name: Upload build logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: |
+          ./DerivedData/Logs
+          ~/Library/Logs/DiagnosticReports
+        retention-days: 7
+        if-no-files-found: ignore
+    
+    - name: Clean up
+      if: always()
+      run: |
+        # Shutdown the simulator
+        xcrun simctl shutdown $SIMULATOR_ID || true

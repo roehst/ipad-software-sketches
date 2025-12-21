@@ -154,37 +154,28 @@ This project uses Swift 5.0+ with SwiftUI.
 
 ## CI/CD
 
-### GitHub Actions Example
+### GitHub Actions Setup
 
-```yaml
-name: iOS Build
+✅ **CI/CD is now configured!** The project includes a GitHub Actions workflow that:
+- Automatically builds the iOS app
+- Runs it in an iPad Air simulator
+- Captures a screenshot of the running app
+- Uploads the screenshot as an artifact
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+**Workflow File**: `.github/workflows/ios-build.yml`
 
-jobs:
-  build:
-    runs-on: macos-latest
+**Status Badge**: 
+[![iOS Build and Screenshot](https://github.com/roehst/ipad-software-sketches/actions/workflows/ios-build.yml/badge.svg)](https://github.com/roehst/ipad-software-sketches/actions/workflows/ios-build.yml)
 
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Select Xcode version
-      run: sudo xcode-select -s /Applications/Xcode_15.0.app
-    
-    - name: Build
-      run: |
-        xcodebuild \
-          -project VectorSketchApp.xcodeproj \
-          -scheme VectorSketchApp \
-          -destination 'platform=iOS Simulator,name=iPad Air (5th generation)' \
-          build \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO
-```
+For detailed information about the CI/CD setup, see [CI_CD.md](CI_CD.md).
+
+### Viewing Screenshots
+
+After the workflow runs successfully:
+1. Go to the GitHub Actions tab
+2. Click on a completed workflow run
+3. Download the `app-screenshot` artifact
+4. Extract and view the screenshot
 
 ## Additional Resources
 
